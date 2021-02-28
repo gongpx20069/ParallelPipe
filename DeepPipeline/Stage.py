@@ -11,6 +11,9 @@ class Stage(metaclass = ABCMeta):
     def set_get_all(self):
         self.is_get_all = True
 
+    def set_get_single(self):
+        self.is_get_all = False
+
     @abstractmethod
     def stage_run(self, x):
         pass
