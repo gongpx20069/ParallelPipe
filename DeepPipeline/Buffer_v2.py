@@ -17,24 +17,18 @@ class Buffer(object):
 
     def get(self):
         result = self.buffer.get()
-        return result['data']
+        return result
 
     def get_all(self):
         datas = []
         with self.is_full:
             self.is_full.wait_for(lambda:self.buffer.qsize() >= self.size)
-            for _ in range(self.size):
-                result = self.buffer.get()
-                datas.append(result['data'])
-                
-        return datas
+            result = list(self.buffer)    
+        return datas[0:self.size]
 
     def put(self, data):
         with self.is_full:
-            self.buffer.put({
-                'timestamp':time.time(),
-                'data':data,
-                })
+            self.buffer.put(data)
             self.is_full.notify()
 
         while self.buffer.qsize() > self.size:
