@@ -53,9 +53,17 @@ class Pipeline(object):
         return self.buffers[-1].get()
 
     def start(self):
-        for i in range(self.stage_num):
-            self.stage_process[i].start()
-        self.end_process.start()
+        if self.multiprocess:
+            for i in range(self.stage_num):
+                self.stage_process[i].start()
+            self.end_process.start()
+
+        else:
+            for i in range(self.stage_num):
+                self.stage_process[i].setDaemon(True)
+                self.stage_process[i].start()
+            self.end_process.setDaemon(True)
+            self.end_process.start()
             
     def __len__(self):
         return self.stage_num
