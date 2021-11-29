@@ -7,6 +7,10 @@ class Stage(metaclass = ABCMeta):
     '''
     def __init__(self):
         self.is_get_all = False
+        self.__stop = False
+
+    def setstop(self):
+        self.__stop = True
 
     def set_get_all(self):
         self.is_get_all = True
@@ -37,12 +41,9 @@ class Stage(metaclass = ABCMeta):
         y = self.stage_run(x)
         # self.write_y_to_buffer(y = y, buffer = next_buffer)
 
-    def __call__(self, per_buffer, next_buffer = None, is_end = False):
-        while True:
-            try:
-                if not is_end:
-                    self.__stage(per_buffer, next_buffer)
-                else:
-                    self.__end_stage(per_buffer)
-            except Exception as ep:
-                raise ep
+    def __call__(self, per_buffer, next_buffer = None):
+        while not self.__stop:
+            if next_buffer is not None:
+                self.__stage(per_buffer, next_buffer)
+            else:
+                self.__end_stage(per_buffer)

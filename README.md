@@ -16,7 +16,7 @@
 
 为避免Python语言多线程的GIL，我们计划使用如下Python自有的库：
 
-- multiprocessing：多进程保证多核CPU并行使用；
+- multiprocessing：多进程保证多核CPU并行使用（可以选择多进程模型）；
 
 - Time&Queue：时间戳保证Queue作为Buffer中信息的交换中介；多线程锁保证读写一致性；
 
@@ -34,17 +34,20 @@
            return x
    ```
    其中，每个单阶段任务都必须继承DeepPipeline包中的Stage类，并实现stage_run(x)方法，y = stage_run(x)中输入x是上一阶段的输出，返回值y是本阶段的处理结果。
+   
 2. 除了正常的单阶段处理任务，我们还需要定义一下流水线最终的输出任务（比如：视频展示、数据保存），这时我们依然需要继承DeepPipeline中的Stage类，不过不需要返回值。以如下程序为例：
    ```python
    class stage_end(Stage):
     def stage_run(self, x):
         print(x)
    ```
-3. 在定义完成所有的单阶段任务后，我们需要实例化DeepPipeline包中的Pipeline类，并指明最终的输出阶段。以如下程序为例：
+   
+3. 在定义完成所有的单阶段任务后，我们需要实例化DeepPipeline包中的Pipeline类，并指明最终的输出阶段。以如下程序为例（其中，multiprocess为True时，调用多进程，为False时，调用多线程）：
    ```python
-   P = Pipeline(stages = [one, two, three], end_stage = end, buffer_size = 2)
+   P = Pipeline(stages = [one, two, three], end_stage = end, buffer_size = 2, multiprocess=False)
    ```
    其中，one, two, three, end为继承了Stage类并实现了stage_run函数的类的实例。buffer_size=2为不同阶段之间的缓冲区大小（进行相邻阶段之间的信息交互）。
+   
 4. 运行整体工作流：
    ```python
    P.start()
@@ -53,6 +56,13 @@
    ```
    P.put("Something Stage one can process.")
    ```
+5. 再完成所有的工作后，我们可以调用Pipeline的setstop引导所有子程序结束，：
+
+   ```
+   P.setstop()
+   ```
+
+   
 
 以上介绍的整体测试代码如下：
 
@@ -60,7 +70,7 @@
 from DeepPipeline import Pipeline, Stage
 import time
 
-class stage_one(Stage):
+class stage_one(Stage):        
     def stage_run(self, x):
         time.sleep(0.5)
         x.append("stage one")
@@ -89,11 +99,16 @@ if __name__ == '__main__':
     three = stage_three()
     end = stage_end()
 
-    P = Pipeline(stages = [one, two, three], end_stage = end, buffer_size = 2)
+    P = Pipeline(stages = [one, two, three], end_stage = end, buffer_size = 2, multiprocess=True)
     P.start()
+    
     for i in range(1, 11):
-        P.put(["Pipeline: {}".format(i)])
-        time.sleep(0.3)
+        try:
+            P.put(["Pipeline: {}".format(i)])
+            time.sleep(0.3)
+        except (Exception,KeyboardInterrupt) as ep:
+                raise ep
+    P.setstop()
 ```
 
 最终输出为：

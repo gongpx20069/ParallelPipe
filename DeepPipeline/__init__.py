@@ -1,3 +1,3 @@
-from DeepPipeline.Pipeline import Pipeline
-from DeepPipeline.Stage import Stage
-from DeepPipeline.Buffer import Buffer
+from .Pipeline import Pipeline
+from .Stage import Stage
+from .Buffer import Buffer
