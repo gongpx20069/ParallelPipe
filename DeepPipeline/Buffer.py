@@ -5,7 +5,7 @@ from collections import deque
 import time
 
 class Buffer(object):
-    def __init__(self, size, multiprocess=True):
+    def __init__(self, size:int, multiprocess:bool=True) -> None:
         self.size       = size
         self.multiprocess = multiprocess
         # self.manager    = Manager()
@@ -23,10 +23,10 @@ class Buffer(object):
             self.currtime = 0
         # self.has_pos    = Condition(self.lock)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.buffer)
 
-    def get(self):
+    def get(self) -> any:
         if self.multiprocess:
             result = self.buffer.get()
         else:
@@ -37,7 +37,7 @@ class Buffer(object):
                 result = result['data']
         return result
 
-    def get_all(self):
+    def get_all(self) -> list:
         if self.multiprocess:
             datas = []
             with self.is_full:
@@ -53,7 +53,7 @@ class Buffer(object):
                 datas = list(map(lambda x:x['data'], listbuffer))
         return datas
 
-    def put(self, data):
+    def put(self, data:any):
         if self.multiprocess:
             with self.is_full:
                 self.buffer.put(data)

@@ -1,10 +1,12 @@
+from __future__ import annotations
 from multiprocessing import Process, Queue, Lock
 from .Buffer import Buffer
+from .Stage import Stage
 import threading
 import time
 
 class Pipeline(object):
-    def __init__(self, stages, end_stage=None, buffer_size=1, multiprocess=False):
+    def __init__(self, stages:list[Stage], end_stage:Stage=None, buffer_size:int=1, multiprocess:int=False) -> bool:
         self.stages     = stages
         self.end_stage = end_stage
         self.stage_num  = len(stages)
@@ -46,7 +48,7 @@ class Pipeline(object):
                 stage.setstop()
             self.end_stage.setstop()
 
-    def put(self, x):
+    def put(self, x:any):
         self.buffers[0].put(x)
 
     def get(self):
