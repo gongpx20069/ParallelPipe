@@ -99,7 +99,7 @@ if __name__ == '__main__':
     three = stage_three()
     end = stage_end()
 
-    P = Pipeline(stages = [one, two, three], end_stage = end, buffer_size = 2, multiprocess=True)
+    P = Pipeline(stages = [one, two, three, end], buffer_size = 2, multiprocess=True)
     P.start()
     
     for i in range(1, 11):
@@ -151,18 +151,16 @@ one.set_get_single()
 Pipeline类有如下可选参数进行实例初始化：
 
 ```python
-P = Pipeline(stages = [one, two, three], end_stage = end, buffer_size = 2)
+P = Pipeline(stages = [one, two, three, end], buffer_size = 2, multiprocess=True)
 ```
 
 其中：
 
-- stages: list，多阶段类（Stage）子类的实例化的列表；
+- stages: list[Stage]，多阶段类（Stage）子类的实例化的列表；
 
-- end_stage: Stage， 多阶段类（Stage）子类的实例化；
+- buffer_size: list or int，相邻阶段的数据交换缓冲区大小，如果是list类型，必须和stage的长度一致，比如：当存在4个单阶段任务时，buffer_size的列表大小为4。
 
-- buffer_size: list or int，相邻阶段的数据交换缓冲区大小，如果是list类型，必须比stages列表的大小多1，比如：当存在4个单阶段任务时，buffer_size的列表大小为5。
-
-  【对于buffer_size，我们为每个阶段都准备了一个buffer作为输入，同时也为end_stage准备了一个buffer作为输入，因此共有(len(stages)+1)的列表大小。】
+  【对于buffer_size，我们为每个阶段都准备了一个buffer作为输入，因此共有len(stages)的列表大小。】
 
 在一切准备完成后，我们只需要运行整体工作流：
    ```python
