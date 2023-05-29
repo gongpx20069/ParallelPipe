@@ -30,7 +30,7 @@ if __name__ == '__main__':
     three = stage_three()
     end = stage_end()
 
-    P = Pipeline(stages = [one, two, three], end_stage = end, buffer_size = 2, multiprocess=True)
+    P = Pipeline(stages = [one, two, three, end], buffer_size = 2, multiprocess=True)
     P.start()
     
     for i in range(1, 11):

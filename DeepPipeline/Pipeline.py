@@ -3,36 +3,37 @@ from multiprocessing import Process, Queue, Lock
 from .Buffer import Buffer
 from .Stage import Stage
 import threading
-import time
 
 class Pipeline(object):
     def __init__(self, stages:list[Stage], end_stage:Stage=None, buffer_size:int=1, multiprocess:int=False) -> bool:
-        self.stages     = stages
-        self.end_stage = end_stage
-        self.stage_num  = len(stages)
+        self.stages = stages
+        if end_stage is not None:
+            self.stages.append(end_stage)
+
+        self.stages[-1].set_end_stage()
+        self.stage_num = len(self.stages)
         self.multiprocess = multiprocess
 
         if type(buffer_size) == int:
-            self.buffers = [Buffer(size=buffer_size, multiprocess=multiprocess) for _ in range(self.stage_num + 1)]
+            self.buffers = [Buffer(size=buffer_size, multiprocess=multiprocess) for _ in range(self.stage_num)]
         elif type(buffer_size) == list:
             try:
-                self.buffers = [Buffer(size=buffer_size[i], multiprocess=multiprocess) for i in range(self.stage_num + 1)]
+                self.buffers = [Buffer(size=buffer_size[i], multiprocess=multiprocess) for i in range(self.stage_num)]
             except:
-                raise Exception("length of buffer_size (list) should be equal to length of stages (list)")
+                raise Exception("length of buffer_size (list) should be equal to length of stages (list).")
         else:
             raise Exception("type of buffer_size should be (int) or (list)")
 
-        if multiprocess:
-            self.stage_process = [Process(target=stages[i] , args=(self.buffers[i], self.buffers[i+1])) for i in range(self.stage_num)]
-        
+        if self.multiprocess:
             try:
-                self.end_process = Process(target=end_stage , args=(self.buffers[-1], None))
+                self.stage_process = [Process(target=self.stages[i], args=(self.buffers[i], self.buffers[i+1])) for i in range(self.stage_num - 1)]
+                self.stage_process.append(Process(target=self.stages[-1], args=(self.buffers[-1], None)))
             except:
                 raise Exception("the end of the pipeline should be a class (class <Stage>)")
         else:
-            self.stage_process = [threading.Thread(target=stages[i] , args=(self.buffers[i], self.buffers[i+1])) for i in range(self.stage_num)]
             try:
-                self.end_process = threading.Thread(target=end_stage , args=(self.buffers[-1], None))
+                self.stage_process = [threading.Thread(target=self.stages[i], args=(self.buffers[i], self.buffers[i+1])) for i in range(self.stage_num - 1)]
+                self.stage_process.append(threading.Thread(target=self.stages[-1], args=(self.buffers[-1], None)))
             except:
                 raise Exception("the end of the pipeline should be a class (class <Stage>)")
 
@@ -41,12 +42,9 @@ class Pipeline(object):
             for stage in self.stage_process:
                 stage.terminate()
                 stage.join()
-            self.end_process.terminate()
-            self.end_process.join()
         else:
             for stage in self.stages:
                 stage.setstop()
-            self.end_stage.setstop()
 
     def put(self, x:any):
         self.buffers[0].put(x)
@@ -58,15 +56,12 @@ class Pipeline(object):
         if self.multiprocess:
             for i in range(self.stage_num):
                 self.stage_process[i].start()
-            self.end_process.start()
 
         else:
             for i in range(self.stage_num):
                 self.stage_process[i].setDaemon(True)
                 self.stage_process[i].start()
-            self.end_process.setDaemon(True)
-            self.end_process.start()
-            
+
     def __len__(self):
         return self.stage_num
 
