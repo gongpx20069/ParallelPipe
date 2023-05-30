@@ -1,7 +1,7 @@
-<h2 align="center">Deep Learning Pipeline Architecture (DeepPipeline)</h2>
+<h2 align="center">Deep Learning Pipeline Architecture (ParallelPipe)</h2>
 <p align="center">
-Language: <a href="https://github.com/gongpx20069/DeepPipeline#readme" target="_blank" rel="noopener noreferrer">English</a>
-  | <a href="https://github.com/gongpx20069/DeepPipeline#readme" target="_blank" rel="noopener noreferrer">中文</a>
+Language: <a href="https://github.com/gongpx20069/ParallelPipe#readme" target="_blank" rel="noopener noreferrer">English</a>
+  | <a href="https://github.com/gongpx20069/ParallelPipe#readme" target="_blank" rel="noopener noreferrer">中文</a>
 </p>
 
 -------------------------
@@ -32,16 +32,16 @@ Time&Queue: Uses timestamps to ensure information exchange between queues as buf
            x.append("stage one")
            return x
    ```
-In this example, each individual stage task must inherit the Stage class from the DeepPipeline package and implement the stage_run(x) method. The input x of stage_run(x) is the output from the previous stage, and the return value y is the processing result of the current stage.
+In this example, each individual stage task must inherit the Stage class from the ParallelPipe package and implement the stage_run(x) method. The input x of stage_run(x) is the output from the previous stage, and the return value y is the processing result of the current stage.
 
-2. In addition to regular individual stage processing tasks, we also need to define the final output task of the pipeline (e.g., video display, data storage). In this case, we still need to inherit the Stage class from DeepPipeline, but no return value is required. Here's an example:
+2. In addition to regular individual stage processing tasks, we also need to define the final output task of the pipeline (e.g., video display, data storage). In this case, we still need to inherit the Stage class from ParallelPipe, but no return value is required. Here's an example:
 ```python
    class stage_end(Stage):
     def stage_run(self, x):
         print(x)
    ```
 
-3. After defining all the individual stage tasks, we need to instantiate the `Pipeline` class from the `DeepPipeline` package and specify the final output stage. Here is an example program:
+3. After defining all the individual stage tasks, we need to instantiate the `Pipeline` class from the `ParallelPipe` package and specify the final output stage. Here is an example program:
 ```python
 P = Pipeline(stages=[one, two, three], end_stage=end, buffer_size=2, multiprocess=False)
 ```
@@ -65,7 +65,7 @@ In this example, the `multiprocess` parameter is set to `False`, which means the
 The overall test code mentioned above is as follows:
 
 ```python
-from DeepPipeline import Pipeline, Stage
+from ParallelPipe import Pipeline, Stage
 import time
 
 class stage_one(Stage):        
@@ -124,7 +124,7 @@ output:
 
 #### 2.2 `Stage` Class
 
-The `Stage` class is provided by the DeepPipeline package, and each individual stage task must inherit this class and implement the `stage_run(x)` method. In the equation `y = stage_run(x)`, `x` represents the output from the previous stage, and `y` represents the processing result of the current stage.
+The `Stage` class is provided by the ParallelPipe package, and each individual stage task must inherit this class and implement the `stage_run(x)` method. In the equation `y = stage_run(x)`, `x` represents the output from the previous stage, and `y` represents the processing result of the current stage.
 
 For example, consider the following code:
 
@@ -217,16 +217,16 @@ You can add inputs to the pipeline using the `put` function as needed. The pipel
            x.append("stage one")
            return x
    ```
-   其中，每个单阶段任务都必须继承DeepPipeline包中的Stage类，并实现stage_run(x)方法，y = stage_run(x)中输入x是上一阶段的输出，返回值y是本阶段的处理结果。
+   其中，每个单阶段任务都必须继承ParallelPipe包中的Stage类，并实现stage_run(x)方法，y = stage_run(x)中输入x是上一阶段的输出，返回值y是本阶段的处理结果。
    
-2. 除了正常的单阶段处理任务，我们还需要定义一下流水线最终的输出任务（比如：视频展示、数据保存），这时我们依然需要继承DeepPipeline中的Stage类，不过不需要返回值。以如下程序为例：
+2. 除了正常的单阶段处理任务，我们还需要定义一下流水线最终的输出任务（比如：视频展示、数据保存），这时我们依然需要继承ParallelPipe中的Stage类，不过不需要返回值。以如下程序为例：
    ```python
    class stage_end(Stage):
     def stage_run(self, x):
         print(x)
    ```
    
-3. 在定义完成所有的单阶段任务后，我们需要实例化DeepPipeline包中的Pipeline类，并指明最终的输出阶段。以如下程序为例（其中，multiprocess为True时，调用多进程，为False时，调用多线程）：
+3. 在定义完成所有的单阶段任务后，我们需要实例化ParallelPipe包中的Pipeline类，并指明最终的输出阶段。以如下程序为例（其中，multiprocess为True时，调用多进程，为False时，调用多线程）：
    ```python
    P = Pipeline(stages = [one, two, three], end_stage = end, buffer_size = 2, multiprocess=False)
    ```
@@ -251,7 +251,7 @@ You can add inputs to the pipeline using the `put` function as needed. The pipel
 以上介绍的整体测试代码如下：
 
 ```python
-from DeepPipeline import Pipeline, Stage
+from ParallelPipe import Pipeline, Stage
 import time
 
 class stage_one(Stage):        
@@ -308,7 +308,7 @@ if __name__ == '__main__':
 ['Pipeline: 10', 'stage one', 'stage two', 'stage three']
 ```
 #### 2.2 Stage类
-每个单阶段任务都必须继承DeepPipeline包中的Stage类，并实现stage_run(x)方法，y = stage_run(x)中输入x是上一阶段的输出，返回值y是本阶段的处理结果。
+每个单阶段任务都必须继承ParallelPipe包中的Stage类，并实现stage_run(x)方法，y = stage_run(x)中输入x是上一阶段的输出，返回值y是本阶段的处理结果。
    ```python
 class stage_one(Stage):
     def stage_run(self, x):

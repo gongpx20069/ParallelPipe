@@ -1,4 +1,4 @@
-from DeepPipeline import Pipeline, Stage
+from ParallelPipe import Pipeline, Stage
 import time
 
 class stage_one(Stage):        
