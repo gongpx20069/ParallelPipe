@@ -5,12 +5,19 @@ Language: <a href="https://github.com/gongpx20069/ParallelPipe#readme" target="_
 </p>
 
 -------------------------
+
+## Write in advance
+
+You can install this package using the following command:
+
+```pip install PyParallelPipe```
+
 ### 1. Overview
 In deep learning, many tasks in practical business scenarios are multi-stage and decomposable. Taking behavior recognition as an example, when performing behavior recognition using RGB video streams, we can divide the overall workflow into four steps: data collection, object recognition, object tracking, and behavior classification, as shown in Figure 1. If these four steps are executed sequentially, it would consume a significant amount of time. However, if these four steps can run simultaneously, it often enables real-time processing in practical applications, overcoming the time-consuming nature of sequential execution.
 
 The design principles of the framework are: **decoupling, reusability, readability, and high performance**.
 
-![pipeline_zh](docs/pipeline_zh.png)
+[![pipeline_zh](docs/pipeline_zh.png)](https://github.com/gongpx20069/ParallelPipe/blob/main/docs/pipeline_zh.png)
 
 #### 1.1 Environment Requirements
 This framework can run in a Python 3.5+ environment without requiring any additional Python dependencies.
@@ -184,13 +191,19 @@ You can add inputs to the pipeline using the `put` function as needed. The pipel
 
 --------------------------------
 
+## 简单安装
+
+你可以使用如下命令安装本Python包：
+
+```pip install PyParallelPipe```
+
 ### 1. 概述
 
 在深度学习中，很多实际业务场景中的任务是多阶段的，可拆解的任务。如图1，以行为识别为例，在使用RGB视频流进行行为识别时，我们可以将整体工作流分为四个步骤（数据采集、目标识别、目标追踪、行为分类）。如果四个步骤串行运行，则会占用大量的时间。如果四个步骤可以同时运行，往往可以使串行占用大量时间的方法在实际业务中实时进行。
 
 框架设计宗旨为：**解耦，可复用，易理解，高性能。**
 
-![pipeline_zh](docs/pipeline_zh.png)
+[![pipeline_zh](docs/pipeline_zh.png)](https://github.com/gongpx20069/ParallelPipe/blob/main/docs/pipeline_zh.png)
 
 #### 1.1 使用环境
 
