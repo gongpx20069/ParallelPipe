@@ -1,4 +1,4 @@
-<h2 align="center">Deep Learning Pipeline Architecture (ParallelPipe)</h2>
+<h2 align="center">Python Parallel Pipeline Architecture (ParallelPipe)</h2>
 <p align="center">
 Language: <a href="https://github.com/gongpx20069/ParallelPipe#readme" target="_blank" rel="noopener noreferrer">English</a>
   | <a href="https://github.com/gongpx20069/ParallelPipe#readme" target="_blank" rel="noopener noreferrer">中文</a>
