@@ -20,19 +20,26 @@ class Buffer(object):
         return len(self.buffer)
 
     def get(self) -> any:
-        with self.is_empty:
-            self.is_empty.wait_for((lambda:((len(self.buffer)>0) and (self.buffer[-1]['time']>self.currtime))))
-            result = self.buffer[-1]
-            self.currtime = result['time']
-            result = result['data']
+        if self.multiprocess:
+            with self.is_empty:
+                self.is_empty.wait_for((lambda:((len(self.buffer)>0) and (self.buffer[-1]['time']>self.currtime))))
+                result = self.buffer.pop()
+                self.currtime = result['time']
+                result = result['data']
+        else:
+            with self.is_empty:
+                self.is_empty.wait_for((lambda:((len(self.buffer)>0) and (self.buffer[-1]['time']>self.currtime))))
+                result = self.buffer[-1]
+                self.currtime = result['time']
+                result = result['data']
         return result
 
     def get_all(self) -> list:
         if self.multiprocess:
             with self.is_empty:
                 self.is_empty.wait_for((lambda:((len(self.buffer)==self.size) and (self.buffer[-1]['time']>self.currtime))))
-                self.currtime = listbuffer[-1]['time']
-                datas = list(map(lambda x:x['data'], listbuffer))
+                self.currtime = self.buffer[-1]['time']
+                datas = list(map(lambda x:x['data'], self.buffer))
         else:
             with self.is_empty:
                 self.is_empty.wait_for((lambda:((len(self.buffer)==self.size) and (self.buffer[-1]['time']>self.currtime))))
@@ -51,5 +58,5 @@ class Buffer(object):
             self.is_empty.notify()
 
             if self.multiprocess:
-                if len(self.buffer) > self.size:
-                    self.buffer = self.buffer[-self.size:-1]
+                while len(self.buffer) > self.size:
+                    self.buffer.pop(0)

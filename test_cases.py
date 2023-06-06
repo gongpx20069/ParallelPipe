@@ -35,6 +35,7 @@ if __name__ == '__main__':
     
     for i in range(1, 11):
         try:
+            print("Put id {} into Pipeline".format(i))
             P.put(["Pipeline: {}".format(i)])
             time.sleep(0.3)
         except (Exception,KeyboardInterrupt) as ep:
