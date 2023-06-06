@@ -1,5 +1,5 @@
 from __future__ import annotations
-from multiprocessing import Process, Queue, Lock
+from multiprocessing import Process, Manager
 from .Buffer import Buffer
 from .Stage import Stage
 import threading
@@ -14,8 +14,10 @@ class Pipeline(object):
         self.stage_num = len(self.stages)
         self.multiprocess = multiprocess
 
+        self.manager = Manager() if self.multiprocess else None
+
         if type(buffer_size) == int:
-            self.buffers = [Buffer(size=buffer_size, multiprocess=multiprocess) for _ in range(self.stage_num)]
+            self.buffers = [Buffer(size=buffer_size, multiprocess=multiprocess, manager=self.manager) for _ in range(self.stage_num)]
         elif type(buffer_size) == list:
             try:
                 self.buffers = [Buffer(size=buffer_size[i], multiprocess=multiprocess) for i in range(self.stage_num)]
@@ -38,13 +40,9 @@ class Pipeline(object):
                 raise Exception("the end of the pipeline should be a class (class <Stage>)")
 
     def setstop(self):
-        if self.multiprocess:
-            for stage in self.stage_process:
-                stage.terminate()
-                stage.join()
-        else:
-            for stage in self.stages:
-                stage.setstop()
+        for stage in self.stages:
+            stage.setstop()
+        if self.multiprocess: self.manager.shutdown()
 
     def put(self, x:any):
         self.buffers[0].put(x)
@@ -55,8 +53,8 @@ class Pipeline(object):
     def start(self):
         if self.multiprocess:
             for i in range(self.stage_num):
+                self.stage_process[i].daemon = True
                 self.stage_process[i].start()
-
         else:
             for i in range(self.stage_num):
                 self.stage_process[i].setDaemon(True)
