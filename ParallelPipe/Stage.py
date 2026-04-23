@@ -1,6 +1,12 @@
 from abc import ABCMeta, abstractmethod
 from .Buffer import Buffer
 
+
+class _StopSentinel:
+    """Sentinel value to signal pipeline stages to stop."""
+    pass
+
+
 class Stage(metaclass = ABCMeta):
     '''
     stage_run: base class for the multi-stage pipline. 
@@ -37,6 +43,11 @@ class Stage(metaclass = ABCMeta):
 
     def __stage(self, per_buffer:Buffer, next_buffer:Buffer):
         x = self.read_x_from_buffer(buffer = per_buffer)
+        if isinstance(x, _StopSentinel):
+            if not self.__is_end_stage and next_buffer is not None:
+                self.write_y_to_buffer(y = x, buffer = next_buffer)
+            self.__stop = True
+            return
         y = self.stage_run(x)
         if not self.__is_end_stage:
             self.write_y_to_buffer(y = y, buffer = next_buffer)

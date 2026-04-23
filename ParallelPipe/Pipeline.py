@@ -1,7 +1,7 @@
 from __future__ import annotations
 from multiprocessing import Process, Manager
 from .Buffer import Buffer
-from .Stage import Stage
+from .Stage import Stage, _StopSentinel
 import threading
 
 class Pipeline(object):
@@ -20,7 +20,7 @@ class Pipeline(object):
             self.buffers = [Buffer(size=buffer_size, multiprocess=multiprocess, manager=self.manager) for _ in range(self.stage_num)]
         elif type(buffer_size) == list:
             try:
-                self.buffers = [Buffer(size=buffer_size[i], multiprocess=multiprocess) for i in range(self.stage_num)]
+                self.buffers = [Buffer(size=buffer_size[i], multiprocess=multiprocess, manager=self.manager) for i in range(self.stage_num)]
             except:
                 raise Exception("length of buffer_size (list) should be equal to length of stages (list).")
         else:
@@ -40,9 +40,18 @@ class Pipeline(object):
                 raise Exception("the end of the pipeline should be a class (class <Stage>)")
 
     def setstop(self):
-        for stage in self.stages:
-            stage.setstop()
-        if self.multiprocess: self.manager.shutdown()
+        if self.multiprocess:
+            self.buffers[0].put(_StopSentinel())
+            for p in self.stage_process:
+                p.join(timeout=30)
+            for p in self.stage_process:
+                if p.is_alive():
+                    p.terminate()
+                    p.join(timeout=5)
+            self.manager.shutdown()
+        else:
+            for stage in self.stages:
+                stage.setstop()
 
     def put(self, x:any):
         self.buffers[0].put(x)
