@@ -8,9 +8,17 @@ Language: <a href="https://github.com/gongpx20069/ParallelPipe#readme" target="_
 
 ## Write in advance
 
-You can install this package using the following command:
+You can install this package using one of the following methods:
 
-```pip install PyParallelPipe```
+```bash
+pip install PyParallelPipe
+```
+
+Or install the latest version directly from GitHub:
+
+```bash
+pip install git+https://github.com/gongpx20069/ParallelPipe.git
+```
 
 ### 1. Overview
 In deep learning, many tasks in practical business scenarios are multi-stage and decomposable. Taking behavior recognition as an example, when performing behavior recognition using RGB video streams, we can divide the overall workflow into four steps: data collection, object recognition, object tracking, and behavior classification, as shown in Figure 1. If these four steps are executed sequentially, it would consume a significant amount of time. However, if these four steps can run simultaneously, it often enables real-time processing in practical applications, overcoming the time-consuming nature of sequential execution.
@@ -195,7 +203,15 @@ You can add inputs to the pipeline using the `put` function as needed. The pipel
 
 你可以使用如下命令安装本Python包：
 
-```pip install PyParallelPipe```
+```bash
+pip install PyParallelPipe
+```
+
+或者从 GitHub 安装最新版本：
+
+```bash
+pip install git+https://github.com/gongpx20069/ParallelPipe.git
+```
 
 ### 1. 概述
 
